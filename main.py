@@ -1,4 +1,4 @@
-﻿import sys
+import sys
 from PySide6 import QtWidgets
 from grad_time.main_window import MainWindow
 

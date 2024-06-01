@@ -1,22 +1,27 @@
 from time import gmtime, strftime
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Signal, Slot
 from PySide6.QtWidgets import QMainWindow
-from PySide6.QtGui import QCloseEvent
+from PySide6.QtGui import QCloseEvent, QKeyEvent
 from grad_time.timer import TimerThread
 from grad_time.save_times import write_data
+from grad_time.category_dropdown import EditableComboBox
 from utils import STYLE_SHEET
 
 
 class MainWindow(QMainWindow):
     """Class for the main window of the application"""
+
+    main_window_clicked = Signal()
+
     def __init__(self):
         from grad_time.ui.main_window import Ui_MainWindow
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.category_combobox = EditableComboBox(self, self.ui.comboBox_category)
         self.setStyleSheet(STYLE_SHEET)
         self.ui.button_stop_timer.setEnabled(False)
-
+        self.elapsed_time = 0
         self.timer = TimerThread()
         self.connect_signals()
 
@@ -48,6 +53,10 @@ class MainWindow(QMainWindow):
         """Enables the other button and disables the other"""
         self.ui.button_start_timer.setEnabled(not timing)
         self.ui.button_stop_timer.setEnabled(timing)
+
+    def mousePressEvent(self, event: QKeyEvent):
+        self.main_window_clicked.emit()
+        super().mousePressEvent(event)
 
     def closeEvent(self, event: QCloseEvent):
         """Handles QCLoseEvents"""

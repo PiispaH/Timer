@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="button_start_timer">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>100</y>
+      <x>10</x>
+      <y>60</y>
       <width>75</width>
       <height>24</height>
      </rect>
@@ -30,8 +30,8 @@
    <widget class="QPushButton" name="button_stop_timer">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>150</y>
+      <x>10</x>
+      <y>100</y>
       <width>75</width>
       <height>24</height>
      </rect>
@@ -43,8 +43,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>90</y>
+      <x>260</x>
+      <y>10</y>
       <width>101</width>
       <height>21</height>
      </rect>
@@ -56,40 +56,76 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>110</y>
+      <x>260</x>
+      <y>30</y>
       <width>101</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>TIME</string>
+     <string>00:00:00</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>140</y>
-      <width>101</width>
+      <x>260</x>
+      <y>60</y>
+      <width>151</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Time recorded:</string>
+     <string>Time recorded in session:</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>160</y>
+      <x>260</x>
+      <y>80</y>
       <width>101</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>TIME</string>
+     <string>00:00:00</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox_category">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>151</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>110</y>
+      <width>151</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Time recorded overall:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>130</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>00:00:00</string>
     </property>
    </widget>
   </widget>
