@@ -1,11 +1,12 @@
 from time import gmtime, strftime
-from PySide6.QtCore import Signal, Slot
+from PySide6.QtCore import Signal, Slot, Qt
 from PySide6.QtWidgets import QMainWindow
 from PySide6.QtGui import QCloseEvent, QKeyEvent
-from grad_time.timer import TimerThread
-from grad_time.save_times import write_data
-from grad_time.category_dropdown import EditableComboBox
-from utils import STYLE_SHEET
+from .timer import TimerThread
+from .save_times import write_data
+from .category_dropdown import EditableComboBox
+from .database.handle_database import DatabaseHandler
+from utils import STYLE_SHEET, set_window_icon
 
 
 class MainWindow(QMainWindow):
@@ -15,10 +16,16 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         from grad_time.ui.main_window import Ui_MainWindow
+
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.category_combobox = EditableComboBox(self, self.ui.comboBox_category)
+        set_window_icon(self)
+        self.db_handler = DatabaseHandler()
+        self.category_ids = self.db_handler.get_categories()
+        self.category_combobox = EditableComboBox(
+            self, self.ui.comboBox_category, set(self.category_ids.keys())
+        )
         self.setStyleSheet(STYLE_SHEET)
         self.ui.button_stop_timer.setEnabled(False)
         self.elapsed_time = 0
@@ -30,6 +37,24 @@ class MainWindow(QMainWindow):
         self.ui.button_start_timer.clicked.connect(self.start_timer)
         self.ui.button_stop_timer.clicked.connect(self.stop_timer)
         self.timer.update_time.connect(self._update_status)
+        self.category_combobox.currentIndexChanged.connect(self._handle_category_change)
+        self.category_combobox.new_category_created.connect(
+            self._handle_new_category_added
+        )
+
+    @Slot(str)
+    def _handle_new_category_added(self, category: str):
+        """Adds the new category to the database"""
+        category_id = self.db_handler.new_category(category)
+        self.category_ids[category] = category_id
+
+    @Slot(int)
+    def _handle_category_change(self, index: int):
+        """Fetches the data of the selected category from the database and refreshes the
+        windows with the new data"""
+        category = self.category_combobox.itemData(index, Qt.DisplayRole)
+        category_id = self.category_ids.get(category)
+        # Some query here to load the data from the DB
 
     def start_timer(self):
         """Starts the timer in another thread"""
@@ -63,4 +88,5 @@ class MainWindow(QMainWindow):
         if self.timer.isRunning():
             self.timer.stop()
         write_data({"Timer": self.elapsed_time})
+        self.db_handler.close()
         super().closeEvent(event)
