@@ -1,4 +1,5 @@
 import os
+import sys
 import ctypes
 from PySide6.QtGui import QIcon
 
@@ -11,5 +12,6 @@ STYLE_SHEET = "QPushButton:disabled { color: gray; }"
 def set_window_icon(window):
     """Sets the window icon and the taskbar icon as well"""
     window.setWindowIcon(QIcon(os.path.join(UI_FOLDER_PATH, "icon.png")))
-    myappid = "some.stupid.thig.that.must.be.done"
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    if sys.platform == "win32":
+        myappid = "some.stupid.thig.that.must.be.done"
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
