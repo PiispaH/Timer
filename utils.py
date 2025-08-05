@@ -4,7 +4,7 @@ import ctypes
 from PySide6.QtGui import QIcon
 
 
-DB_PATH = os.path.join(".data", "records.db")
+DB_PATH = os.path.join("sqlite:///", ".data", "records.db")
 UI_FOLDER_PATH = os.path.join("grad_time", "ui")
 STYLE_SHEET = "QPushButton:disabled { color: gray; }"
 
