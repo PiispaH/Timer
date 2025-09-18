@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QCloseEvent
 from PySide6.QtCore import Qt, QEventLoop, QTimer
 from PySide6.QtTest import QTest
-from grad_time.main_window import MainWindow
+from timer.main_window import MainWindow
 
 
 class TestMainWindow(unittest.TestCase):

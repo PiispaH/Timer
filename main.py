@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
+
 import sys
 from PySide6 import QtWidgets
-from grad_time.main_window import MainWindow
+from timer.main_window import MainWindow
 
 
 def main():

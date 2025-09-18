@@ -30,6 +30,9 @@ class EditableComboBox(QComboBox):
         self._timer.setSingleShot(True)
         self._categories = categories
         self.addItems(self._categories)
+        self._current_category = None
+        self._handle_category_change()
+        self.currentIndexChanged.connect(self._handle_category_change)
 
     def eventFilter(self, obj: QObject, event: QEvent):
         """Event filter that allows the popup to stay open when an item is right clicked"""
@@ -48,6 +51,13 @@ class EditableComboBox(QComboBox):
         menu.addAction("Delete", lambda: self.remove_category(item))
         menu.addAction("Rename", lambda: self.rename_category(item))
         menu.exec(self._view.mapToGlobal(position))
+
+    def _handle_category_change(self):
+        self._current_category = self.itemData(self.currentIndex(), Qt.DisplayRole)
+
+    def current_category(self):
+        """Get the current category id"""
+        return self._current_category
 
     @Slot()
     def add_new_category(self):
