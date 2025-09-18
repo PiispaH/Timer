@@ -26,10 +26,10 @@ class DatabaseHandler:
         """Adds a record to the database."""
         cursor = self.db.execute(
             """
-            INSERT INTO Records (category_id, start, end)
-                VALUES (?, ?, ?)
+            INSERT INTO Records (category_id, start, end, duration)
+                VALUES (?, ?, ?, ?)
             """,
-            [category_id, start, end],
+            [category_id, start, end, (end - start).total_seconds()],
         )
         self.db.execute("COMMIT")
         return cursor.lastrowid
@@ -48,7 +48,8 @@ class DatabaseHandler:
         """Opens a connection to the database. If the first time,
         also creates the tables."""
         if not os.path.exists(DB_PATH):
-            os.mkdir(os.path.dirname(DB_PATH))
+            if not os.path.isdir(os.path.dirname(DB_PATH)):
+                os.mkdir(os.path.dirname(DB_PATH))
             self.db = sqlite3.connect(DB_PATH)
             self._create_tables()
         else:
@@ -70,6 +71,7 @@ class DatabaseHandler:
                 category_id INTEGER,
                 start DATETIME,
                 end DATETIME,
+                duration FLOAT,
                 FOREIGN KEY (category_id) REFERENCES Categories(id)
             )
             """

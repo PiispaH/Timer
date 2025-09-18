@@ -1,10 +1,8 @@
 from time import gmtime, strftime
-from datetime import datetime
 from PySide6.QtCore import Signal, Slot
 from PySide6.QtWidgets import QMainWindow
 from PySide6.QtGui import QCloseEvent, QKeyEvent
 from .timer_thread import TimerThread
-from .save_times import write_data
 from .category_dropdown import EditableComboBox
 from .database.handle_database import DatabaseHandler
 from utils import STYLE_SHEET, set_window_icon
@@ -29,6 +27,9 @@ class MainWindow(QMainWindow):
         )
         self.setStyleSheet(STYLE_SHEET)
         self.ui.button_stop_timer.setEnabled(False)
+        self.ui.button_start_timer.setEnabled(
+            self.category_combobox.currentIndex() != -1
+        )
         self.elapsed_time = 0.0
         self.timer = TimerThread()
         self.connect_signals()
@@ -49,6 +50,7 @@ class MainWindow(QMainWindow):
     @Slot(str)
     def _handle_new_category_added(self, category: str):
         """Adds the new category to the database"""
+        self.set_timer_button_states(False)
         category_id = self.db_handler.new_category(category)
         self.category_ids[category] = category_id
 
@@ -60,6 +62,7 @@ class MainWindow(QMainWindow):
 
     def start_timer(self):
         """Starts the timer in another thread"""
+        self.category_combobox.interactable = False
         self.set_timer_button_states(True)
         self.ui.label_2.setText("00:00:00")
         if not self.timer.isRunning():
@@ -83,6 +86,7 @@ class MainWindow(QMainWindow):
         start, end = self.timer.get_data()
         category = self.category_combobox.current_category()
         self.db_handler.add_record(self.category_ids[category], start, end)
+        self.category_combobox.interactable = True
 
     def set_timer_button_states(self, timing: bool):
         """Enables the other button and disables the other"""

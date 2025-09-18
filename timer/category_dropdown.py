@@ -33,6 +33,16 @@ class EditableComboBox(QComboBox):
         self._current_category = None
         self._handle_category_change()
         self.currentIndexChanged.connect(self._handle_category_change)
+        self._interactable = True
+
+    @property
+    def interactable(self):
+        return self._interactable
+
+    @interactable.setter
+    def interactable(self, state: bool):
+        self._interactable = state
+        self.setEnabled(state)
 
     def eventFilter(self, obj: QObject, event: QEvent):
         """Event filter that allows the popup to stay open when an item is right clicked"""
