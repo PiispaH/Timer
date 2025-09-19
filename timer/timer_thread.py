@@ -15,6 +15,11 @@ class TimerThread(QThread):
         self._start_time = None
         self._start_date = None
         self._stop_date = None
+        self._duration = 0
+
+    @property
+    def duration(self) -> float:
+        return self._duration
 
     def run(self):
         self._start_time = time()
@@ -24,7 +29,7 @@ class TimerThread(QThread):
             # Check ten times in a second if the count has stopped
             for _ in range(10):
                 if not self._running:
-                    break
+                    return
                 self.msleep(100)
             self.update_time.emit(self.elapsed_time())
 
@@ -34,6 +39,7 @@ class TimerThread(QThread):
     def stop(self):
         self._running = False
         self._stop_date = datetime.now()
+        self._duration = self.elapsed_time()
         self.wait()
 
     def get_data(self):

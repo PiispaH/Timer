@@ -29,19 +29,26 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(STYLE_SHEET)
         self.ui.button_stop_timer.setEnabled(False)
         self.ui.button_start_timer.setEnabled(
-            self._category_combobox.currentIndex() != -1
+            bool(self._category_combobox.current_category)
         )
         self._elapsed_time = 0.0
-        self._timer = TimerThread()
+        self._timer_thread = TimerThread()
         self._connect_signals()
 
         self._session_time = 0.0
+
+        if self._category_combobox.current_category:
+            self._update_status(0)
+            print("noinii")
+            self._category_combobox.current_category
+
+        # TODO: default to the category that was last selected
 
     def _connect_signals(self):
         """Connects the signals"""
         self.ui.button_start_timer.clicked.connect(self._start_timer)
         self.ui.button_stop_timer.clicked.connect(self._stop_timer)
-        self._timer.update_time.connect(self._update_status)
+        self._timer_thread.update_time.connect(self._update_status)
         self._category_combobox.currentIndexChanged.connect(
             self._handle_category_change
         )
@@ -69,26 +76,34 @@ class MainWindow(QMainWindow):
         self._category_combobox.interactable = False
         self._set_timer_button_states(True)
         self.ui.label_2.setText("00:00:00")
-        if not self._timer.isRunning():
-            self._timer.start()
+        if not self._timer_thread.isRunning():
+            self._timer_thread.start()
 
     @Slot(float)
     def _update_status(self, elapsed_time: float):
-        """Sets the current elapsed time to the window."""
-        formatted_time = strftime("%H:%M:%S", gmtime(elapsed_time))
-        self.ui.label_2.setText(formatted_time)
+        """Updates the times on the counters."""
+        self.ui.label_2.setText(strftime("%H:%M:%S", gmtime(elapsed_time)))
+
+        self.ui.label_4.setText(
+            strftime("%H:%M:%S", gmtime(self._session_time + elapsed_time))
+        )
+
+        category = self._category_combobox.current_category
+        self.ui.label_6.setText(
+            strftime("%H:%M:%S", gmtime(category.duration + elapsed_time))
+        )
 
     def _stop_timer(self):
-        """Stops the timer"""
+        """Stops the timer and saves the time"""
         self._set_timer_button_states(False)
-        self._timer.stop()
+        self._timer_thread.stop()
+        dur = self._timer_thread.duration
 
-        self._session_time += self._timer.elapsed_time()
-        formatted_time = strftime("%H:%M:%S", gmtime(self._session_time))
-        self.ui.label_4.setText(formatted_time)
+        self._session_time += dur
 
-        start, end = self._timer.get_data()
+        start, end = self._timer_thread.get_data()
         category = self._category_combobox.current_category
+        category.duration += dur
         self._db_handler.add_record(category, start, end)
         self._category_combobox.interactable = True
 
@@ -103,9 +118,9 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event: QCloseEvent):
         """Handles QCLoseEvents"""
-        if self._timer.isRunning():
-            self._timer.stop()
-            start, end = self._timer.get_data()
+        if self._timer_thread.isRunning():
+            self._timer_thread.stop()
+            start, end = self._timer_thread.get_data()
             category = self._category_combobox.current_category
             self._db_handler.add_record(category, start, end)
         self._db_handler.close()

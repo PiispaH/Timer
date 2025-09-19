@@ -25,7 +25,7 @@ class TestMainWindow(unittest.TestCase):
 
     def test_timer(self):
         """Tests that the timer starts and stops when the buttons are pressed"""
-        self.assertFalse(self.main_window._timer.isRunning())
+        self.assertFalse(self.main_window._timer_thread.isRunning())
         start_button = self.main_window.ui.button_start_timer
         stop_button = self.main_window.ui.button_stop_timer
 
@@ -36,7 +36,7 @@ class TestMainWindow(unittest.TestCase):
         QTimer.singleShot(1, loop.quit)
         loop.exec_()
 
-        self.assertTrue(self.main_window._timer.isRunning())
+        self.assertTrue(self.main_window._timer_thread.isRunning())
 
         QTest.mouseClick(stop_button, Qt.LeftButton)
-        self.assertFalse(self.main_window._timer.isRunning())
+        self.assertFalse(self.main_window._timer_thread.isRunning())
