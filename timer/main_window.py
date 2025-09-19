@@ -1,12 +1,12 @@
 from time import gmtime, strftime
-from PySide6.QtCore import Signal, Slot, QObject
+from PySide6.QtCore import Signal, Slot
 from PySide6.QtWidgets import QMainWindow
 from PySide6.QtGui import QCloseEvent, QKeyEvent
 from .timer_thread import TimerThread
 from .category_dropdown import EditableComboBox
 from .database.handle_database import DatabaseHandler
 from utils import STYLE_SHEET, set_window_icon
-from .category import Category
+from .category import Category, CategoryManager
 
 
 class MainWindow(QMainWindow):
@@ -22,9 +22,9 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         set_window_icon(self)
         self._db_handler = DatabaseHandler()
-        categories = self._recreate_categories(self._db_handler.get_categories())
+        self._category_mngr = self._db_handler.get_categories()
         self._category_combobox = EditableComboBox(
-            self, self.ui.comboBox_category, categories
+            self, self.ui.comboBox_category, self._category_mngr
         )
         self.setStyleSheet(STYLE_SHEET)
         self.ui.button_stop_timer.setEnabled(False)
@@ -63,13 +63,6 @@ class MainWindow(QMainWindow):
             raise IndexError(f"Invalid category index: {index}")
         category = self._category_combobox.current_category
         self.ui.label_6.setText(strftime("%H:%M:%S", gmtime(category.duration)))
-
-    @staticmethod
-    def _recreate_categories(categories) -> set[Category]:
-        loaded_cats = set()
-        for name, data in categories.items():
-            loaded_cats.add(Category(data["id"], name, data["duration"]))
-        return loaded_cats
 
     def _start_timer(self):
         """Starts the timer in another thread"""

@@ -3,7 +3,7 @@ import sqlite3
 from datetime import datetime
 from typing import Dict
 from utils import DB_PATH
-from ..category import Category
+from ..category import Category, CategoryManager
 
 
 class DatabaseHandler:
@@ -35,7 +35,7 @@ class DatabaseHandler:
         self.db.execute("COMMIT")
         return cursor.lastrowid
 
-    def get_categories(self) -> Dict[str, int]:
+    def get_categories(self) -> CategoryManager:
         """Fetches the categories from the database."""
         categories = self.db.execute(
             """
@@ -43,6 +43,12 @@ class DatabaseHandler:
             FROM Categories
             """
         ).fetchall()
+        cat_mngr = CategoryManager()
+        for data in categories:
+            cat_mngr.recreate_existing(data[1], data[0], self.get_duration(data[1]))
+        return cat_mngr
+
+        # Old implementation
         return {
             data[0]: {"id": data[1], "duration": self.get_duration(data[1])}
             for data in categories
