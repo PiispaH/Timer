@@ -6,7 +6,7 @@ from PySide6.QtGui import QIcon
 PLATFORM = "win" if sys.platform == "win32" else "unix"
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(ROOT_DIR, ".data", "records.db")
+DATA_FOLDER_PATH = os.path.join(ROOT_DIR, ".data")
 UI_FOLDER_PATH = os.path.join("timer", "ui")
 
 STYLE_SHEET = "QPushButton:disabled { color: gray; }"

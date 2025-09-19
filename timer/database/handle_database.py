@@ -2,13 +2,14 @@ import os
 import sqlite3
 from datetime import datetime
 from typing import Dict
-from utils import DB_PATH
+from utils import DATA_FOLDER_PATH
 from ..category import Category, CategoryManager
 
 
 class DatabaseHandler:
-    def __init__(self):
+    def __init__(self, db_name="database"):
         self.db = None
+        self._filepath = os.path.join(DATA_FOLDER_PATH, db_name + ".db")
         self._open_db()
 
     def new_category(self, category: Category) -> int:
@@ -48,12 +49,6 @@ class DatabaseHandler:
             cat_mngr.recreate_existing(data[1], data[0], self.get_duration(data[1]))
         return cat_mngr
 
-        # Old implementation
-        return {
-            data[0]: {"id": data[1], "duration": self.get_duration(data[1])}
-            for data in categories
-        }
-
     def get_duration(self, category_id) -> float:
         """Fetches the complete duration for the given category"""
         duration = self.db.execute(
@@ -69,13 +64,13 @@ class DatabaseHandler:
     def _open_db(self):
         """Opens a connection to the database. If the first time,
         also creates the tables."""
-        if not os.path.exists(DB_PATH):
-            if not os.path.isdir(os.path.dirname(DB_PATH)):
-                os.mkdir(os.path.dirname(DB_PATH))
-            self.db = sqlite3.connect(DB_PATH)
+        if not os.path.exists(self._filepath):
+            if not os.path.isdir(os.path.dirname(self._filepath)):
+                os.mkdir(os.path.dirname(self._filepath))
+            self.db = sqlite3.connect(self._filepath)
             self._create_tables()
         else:
-            self.db = sqlite3.connect(DB_PATH)
+            self.db = sqlite3.connect(self._filepath)
 
     def _create_tables(self):
         self.db.execute(
@@ -102,5 +97,9 @@ class DatabaseHandler:
     def close(self):
         self.db.close()
         if False:  # Debugging
-            if os.path.exists(DB_PATH):
-                os.remove(DB_PATH)
+            if os.path.exists(DATA_FOLDER_PATH):
+                os.remove(DATA_FOLDER_PATH)
+
+    def clear_database(self):
+        self.db = None
+        pass

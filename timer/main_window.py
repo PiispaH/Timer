@@ -1,12 +1,12 @@
 from time import gmtime, strftime
-from PySide6.QtCore import Signal, Slot
+from PySide6.QtCore import Signal, Slot, QSettings
 from PySide6.QtWidgets import QMainWindow
-from PySide6.QtGui import QCloseEvent, QKeyEvent
+from PySide6.QtGui import QCloseEvent, QKeyEvent, QAction
 from .timer_thread import TimerThread
 from .category_dropdown import EditableComboBox
 from .database.handle_database import DatabaseHandler
 from utils import STYLE_SHEET, set_window_icon
-from .category import Category, CategoryManager
+from .category import Category
 
 
 class MainWindow(QMainWindow):
@@ -18,14 +18,20 @@ class MainWindow(QMainWindow):
         from timer.ui.main_window import Ui_MainWindow
 
         super().__init__()
+        self._settings = QSettings("PiispaH", "timer", self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.setWindowTitle("Timer")
         set_window_icon(self)
+        self.restoreGeometry(self._settings.value("geometry"))
+        self.restoreState(self._settings.value("state"))
+
         self._db_handler = DatabaseHandler()
         self._category_mngr = self._db_handler.get_categories()
-        self._category_combobox = EditableComboBox(
-            self, self.ui.comboBox_category, self._category_mngr
-        )
+        self._category_combobox = (
+            self.ui.comboBox_category
+        )  # Has already been promoted to EditableComboBox in ui files
+        self._category_combobox.setup(self, self._category_mngr)
         self.setStyleSheet(STYLE_SHEET)
         self.ui.button_stop_timer.setEnabled(False)
         self.ui.button_start_timer.setEnabled(
@@ -37,12 +43,15 @@ class MainWindow(QMainWindow):
 
         self._session_time = 0.0
 
+        # Try to return the last category selection
         if self._category_combobox.current_category:
+            last_index = int(self._settings.value("cat_box/selected_index", 0))
+            if last_index:
+                self._category_combobox.setCurrentIndex(last_index)
             self._update_status(0)
-            print("noinii")
-            self._category_combobox.current_category
 
-        # TODO: default to the category that was last selected
+        self._db_actions = []
+        self.add_database_action()
 
     def _connect_signals(self):
         """Connects the signals"""
@@ -55,6 +64,9 @@ class MainWindow(QMainWindow):
         self._category_combobox.new_category_created.connect(
             self._handle_new_category_added
         )
+
+    def add_database_action(self):
+        self.ui.menuSelect_database.addAction("db_1")
 
     @Slot(Category)
     def _handle_new_category_added(self, category: Category):
@@ -118,6 +130,13 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event: QCloseEvent):
         """Handles QCLoseEvents"""
+        # Save the window geometry and category selections.
+        self._settings.setValue("geometry", self.saveGeometry())
+        self._settings.setValue("state", self.saveState())
+        self._settings.setValue(
+            "cat_box/selected_index", self._category_combobox.currentIndex()
+        )
+
         if self._timer_thread.isRunning():
             self._timer_thread.stop()
             start, end = self._timer_thread.get_data()

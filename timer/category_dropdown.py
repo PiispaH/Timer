@@ -3,6 +3,10 @@ from PySide6.QtGui import QKeyEvent, QMouseEvent
 from PySide6.QtWidgets import QComboBox, QLineEdit, QMenu, QMessageBox
 from PySide6.QtCore import Signal, Slot, QTimer, Qt, QEvent, QObject, QPoint
 from .category import Category, CategoryManager
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from timer.main_window import MainWindow
 
 
 class CustomLineEdit(QLineEdit):
@@ -21,9 +25,13 @@ class EditableComboBox(QComboBox):
     new_category_created = Signal(Category)
     category_removed = Signal(str)
 
-    def __init__(self, parent: Any, combo_box: QComboBox, cat_mngr: CategoryManager):
+    def __init__(self, parent: Any):
+        """Needed because the UI initialization passes only the parent due to promotion"""
         super().__init__(parent)
-        self.setGeometry(combo_box.geometry())
+
+    def setup(self, main_window: "MainWindow", cat_mngr: CategoryManager):
+        """Actual setup of the class"""
+        self._main_window = main_window
         self._view = self.view()
         self._view.viewport().installEventFilter(self)
         self._view.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -121,5 +129,9 @@ class EditableComboBox(QComboBox):
         self.setLineEdit(CustomLineEdit(self))
         self.lineEdit().setFocus()
         self.lineEdit().selectAll()
-        self.parent().main_window_clicked.connect(self.lineEdit().close)
+        self._main_window.main_window_clicked.connect(self.lineEdit().close)
         self.lineEdit().editingFinished.connect(self.add_new_category)
+
+    def closeEvent(self, event):
+        print("joo")
+        return super().closeEvent(event)
