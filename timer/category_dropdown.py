@@ -1,6 +1,7 @@
 from PySide6.QtGui import QKeyEvent, QMouseEvent
 from PySide6.QtWidgets import QComboBox, QLineEdit, QMenu, QMessageBox
 from PySide6.QtCore import Signal, Slot, QTimer, Qt, QEvent, QObject, QPoint
+from .category import Category
 
 
 class CustomLineEdit(QLineEdit):
@@ -16,7 +17,7 @@ class CustomLineEdit(QLineEdit):
 class EditableComboBox(QComboBox):
     """An editable combobox"""
 
-    new_category_created = Signal(str)
+    new_category_created = Signal(Category)
     category_removed = Signal(str)
 
     def __init__(self, parent, combo_box, categories):
@@ -29,11 +30,9 @@ class EditableComboBox(QComboBox):
         self._timer = QTimer(self)
         self._timer.setSingleShot(True)
         self._categories = categories
-        self.addItems(self._categories)
-        self._current_category = None
-        self._handle_category_change()
-        self.currentIndexChanged.connect(self._handle_category_change)
-        self._interactable = True
+        for category in categories:
+            self.addItem(category.name, userData=category)
+        self.setInsertPolicy(QComboBox.NoInsert)
 
     @property
     def interactable(self):
@@ -62,22 +61,22 @@ class EditableComboBox(QComboBox):
         menu.addAction("Rename", lambda: self.rename_category(item))
         menu.exec(self._view.mapToGlobal(position))
 
-    def _handle_category_change(self):
-        self._current_category = self.itemData(self.currentIndex(), Qt.DisplayRole)
-
+    @property
     def current_category(self):
-        """Get the current category id"""
-        return self._current_category
+        return self.itemData(self.currentIndex())
 
     @Slot()
     def add_new_category(self):
         """Adds new items"""
-        new_item = self.currentText()
-        if new_item and new_item not in self._categories:
-            self._categories.add(new_item)
-            self.setCurrentIndex(self.count() - 1)
-            self.new_category_created.emit(new_item)
+        text = self.currentText()
+        if not text:
+            self.setEditable(False)
+            return
         self.lineEdit().clearFocus()
+        cat = Category.new_unique(text)
+        self.addItem(cat.name, userData=cat)
+        self.setCurrentIndex(self.count() - 1)
+        self.new_category_created.emit(cat)
         self.setEditable(False)
 
     def remove_category(self, category: str):

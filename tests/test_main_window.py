@@ -15,20 +15,20 @@ class TestMainWindow(unittest.TestCase):
     def setUp(self):
         self.main_window = MainWindow()
         self.main_window.show()
-    
+
     def tearDown(self):
         self.main_window.closeEvent(QCloseEvent())
         super().tearDown()
-    
+
     def test_window_is_visible(self):
         self.assertTrue(self.main_window.isVisible())
 
     def test_timer(self):
         """Tests that the timer starts and stops when the buttons are pressed"""
-        self.assertFalse(self.main_window.timer.isRunning())
+        self.assertFalse(self.main_window._timer.isRunning())
         start_button = self.main_window.ui.button_start_timer
         stop_button = self.main_window.ui.button_stop_timer
-        
+
         QTest.mouseClick(start_button, Qt.LeftButton)
 
         # Just so that the timer has enough time to start.
@@ -36,7 +36,7 @@ class TestMainWindow(unittest.TestCase):
         QTimer.singleShot(1, loop.quit)
         loop.exec_()
 
-        self.assertTrue(self.main_window.timer.isRunning())
+        self.assertTrue(self.main_window._timer.isRunning())
 
         QTest.mouseClick(stop_button, Qt.LeftButton)
-        self.assertFalse(self.main_window.timer.isRunning())
+        self.assertFalse(self.main_window._timer.isRunning())
