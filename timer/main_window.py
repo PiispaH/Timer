@@ -1,9 +1,8 @@
 from time import gmtime, strftime
 from PySide6.QtCore import Signal, Slot, QSettings
 from PySide6.QtWidgets import QMainWindow
-from PySide6.QtGui import QCloseEvent, QKeyEvent, QAction
+from PySide6.QtGui import QCloseEvent, QKeyEvent
 from .timer_thread import TimerThread
-from .category_dropdown import EditableComboBox
 from .database.handle_database import DatabaseHandler
 from utils import STYLE_SHEET, set_window_icon
 from .category import Category
@@ -50,9 +49,6 @@ class MainWindow(QMainWindow):
                 self._category_combobox.setCurrentIndex(last_index)
             self._update_status(0)
 
-        self._db_actions = []
-        self.add_database_action()
-
     def _connect_signals(self):
         """Connects the signals"""
         self.ui.button_start_timer.clicked.connect(self._start_timer)
@@ -64,9 +60,6 @@ class MainWindow(QMainWindow):
         self._category_combobox.new_category_created.connect(
             self._handle_new_category_added
         )
-
-    def add_database_action(self):
-        self.ui.menuSelect_database.addAction("db_1")
 
     @Slot(Category)
     def _handle_new_category_added(self, category: Category):

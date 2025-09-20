@@ -11,14 +11,13 @@
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
-    QCursor, QFont, QFontDatabase, QGradient,
-    QIcon, QImage, QKeySequence, QLinearGradient,
-    QPainter, QPalette, QPixmap, QRadialGradient,
-    QTransform)
-from PySide6.QtWidgets import (QApplication, QLabel, QMainWindow, QMenu,
-    QMenuBar, QPushButton, QSizePolicy, QSpacerItem,
-    QStatusBar, QVBoxLayout, QWidget)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QLabel, QMainWindow, QMenuBar,
+    QPushButton, QSizePolicy, QSpacerItem, QStatusBar,
+    QVBoxLayout, QWidget)
 
 from ..category_dropdown import EditableComboBox
 
@@ -26,13 +25,13 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(554, 318)
-        MainWindow.setMinimumSize(QSize(450, 220))
+        MainWindow.resize(530, 280)
+        MainWindow.setMinimumSize(QSize(530, 280))
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayoutWidget = QWidget(self.centralwidget)
         self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
-        self.verticalLayoutWidget.setGeometry(QRect(50, 50, 171, 171))
+        self.verticalLayoutWidget.setGeometry(QRect(40, 40, 171, 171))
         self.verticalLayout = QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -42,6 +41,7 @@ class Ui_MainWindow(object):
 
         self.comboBox_category = EditableComboBox(self.verticalLayoutWidget)
         self.comboBox_category.setObjectName(u"comboBox_category")
+        self.comboBox_category.setEditable(False)
 
         self.verticalLayout.addWidget(self.comboBox_category)
 
@@ -61,7 +61,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayoutWidget_2 = QWidget(self.centralwidget)
         self.verticalLayoutWidget_2.setObjectName(u"verticalLayoutWidget_2")
-        self.verticalLayoutWidget_2.setGeometry(QRect(280, 20, 221, 201))
+        self.verticalLayoutWidget_2.setGeometry(QRect(280, 31, 190, 190))
         self.verticalLayout_2 = QVBoxLayout(self.verticalLayoutWidget_2)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -111,18 +111,11 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 554, 23))
-        self.menuSettings = QMenu(self.menubar)
-        self.menuSettings.setObjectName(u"menuSettings")
-        self.menuSelect_database = QMenu(self.menuSettings)
-        self.menuSelect_database.setObjectName(u"menuSelect_database")
+        self.menubar.setGeometry(QRect(0, 0, 530, 23))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
-
-        self.menubar.addAction(self.menuSettings.menuAction())
-        self.menuSettings.addAction(self.menuSelect_database.menuAction())
 
         self.retranslateUi(MainWindow)
 
@@ -139,7 +132,5 @@ class Ui_MainWindow(object):
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"00:00:00", None))
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"Time recorded in category:", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"00:00:00", None))
-        self.menuSettings.setTitle(QCoreApplication.translate("MainWindow", u"Settings", None))
-        self.menuSelect_database.setTitle(QCoreApplication.translate("MainWindow", u"Select database", None))
     # retranslateUi
 
